@@ -2,8 +2,69 @@ package main
 
 import (
 	"fmt"
+	"image/color"
 	"math"
+	"time"
+
+	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/imdraw"
+	"github.com/faiface/pixel/pixelgl"
 )
+
+const (
+	windowWidth  = 800
+	windowHeight = 600
+	lineHeight = 200
+	lineAngle    = math.Pi / 4 // Kąt nachylenia w radianach
+)
+
+
+func run() {
+	cfg := pixelgl.WindowConfig{
+		Title:  "Animacja Równi Pochylonej",
+		Bounds: pixel.R(0, 0, windowWidth, windowHeight),
+		VSync:  true,
+	}
+
+	win, err := pixelgl.NewWindow(cfg)
+	if err != nil {
+		panic(err)
+	}
+
+	imd := imdraw.New(nil)
+
+	
+
+	for !win.Closed() {
+		win.Clear(color.Black)
+
+		imd.Clear()
+
+		// Oblicz współrzędne punktów początkowego i końcowego lini
+		x1 := float64( windowWidth / 2)-300
+		y1 := float64( windowHeight / 2)
+		
+		
+
+
+		// Narysuj równię pochyloną
+		imd.Color = color.White
+		imd.Push(pixel.V(x1, y1-lineHeight), pixel.V(x1+lineHeight/math.Cos(alfa), y1-lineHeight))
+		imd.Push(pixel.V(x1, y1), pixel.V(x1+lineHeight/math.Cos(alfa), y1-lineHeight))
+		imd.Push(pixel.V(x1,y1),pixel.V(x1,y1-lineHeight))
+
+		imd.Line(5)
+
+		imd.Push(pixel.V(x1, y1),pixel.V(x1+50,y1+50))
+		imd.Rectangle(5)
+
+		imd.Draw(win)
+
+		win.Update()
+		time.Sleep(time.Second / 60) // Ograniczenie liczby klatek na sekundę
+	}
+}
+
 
 const (
 	b=float64(1)
@@ -34,5 +95,7 @@ func main () {
 		v_prev = v
 		a_prev = a
 	}
+
+	pixelgl.Run(run)
 }
 
