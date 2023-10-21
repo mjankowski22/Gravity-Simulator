@@ -1,10 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"image/color"
 	"math"
 	"time"
 
+	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/widget"
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
@@ -39,12 +42,19 @@ func run() {
 	x := x1 +3
 	y := y1 +3
 
+	i := 0
 	for !win.Closed() {
 		win.Clear(color.Black)
-
+		d:=30.0
+		
 		imd.Clear()
 
+		if(y-d*math.Sin(alfa)>y1-lineHeight){
+			x = x1 +3 + sym_result[i]*math.Cos(alfa)
+			y = y1 +3 - sym_result[i]*math.Sin(alfa)
+		}
 		
+
 		
 
 		
@@ -57,9 +67,7 @@ func run() {
 		imd.Line(5)
 
 		imd.Color = color.RGBA{255,0,0,0}
-		d:=40.0
 		
-
 
 		x2 := x + d * math.Cos(alfa)
 		y2 := y - d * math.Sin(alfa)
@@ -84,20 +92,26 @@ func run() {
 		imd.Draw(win)
 
 		win.Update()
-		x += 2*math.Cos(alfa)
-		y -= 2*math.Sin(alfa)
-		time.Sleep(time.Second / 60) // Ograniczenie liczby klatek na sekundę
+		
+		time.Sleep(time.Second/100) 
+		fmt.Println(float64(i)/100)
+		i+=1
 	}
 }
 
 
 const (
-	b=float64(1)
+	b=float64(0)
 	m=float64(1)
-	g=float64(9.81)
+	g=float64(20)
 	u=float64(0.5)
 	alfa = math.Pi/6
 )
+
+var sym_result []float64
+var h = math.Pow(10,-2)
+
+
 
 
 func main () {
@@ -108,11 +122,12 @@ func main () {
 	a:=float64(0) 
 	a_prev :=float64(0) 
 
-	h := math.Pow(10,-3)
+	
 	
 
-	for i := 0; float64(i)*h < float64(10); i++ {
+	for i := 0; x*10*math.Sin(alfa)< lineHeight; i++ {
 		x = x_prev + h*v_prev+math.Pow(h,2)/2*a_prev
+		sym_result = append(sym_result,x*10)
 		v = v_prev + h*a_prev
 		a = -b/m*math.Pow(v_prev,2)-g*u*math.Cos(alfa)+g*math.Sin(alfa)
 		x_prev=x
@@ -120,6 +135,11 @@ func main () {
 		a_prev = a
 	}
 
+	app := app.New()
+	w := app.NewWindow("Hello World")
+
+	w.SetContent(widget.NewLabel("Hello World!"))
+	w.ShowAndRun()
 	pixelgl.Run(run)
 }
 
