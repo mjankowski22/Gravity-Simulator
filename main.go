@@ -16,8 +16,7 @@ import (
 const (
 	windowWidth  = 800
 	windowHeight = 600
-	lineHeight = 200
-	lineAngle    = math.Pi / 6 // Kąt nachylenia w radianach
+	lineHeight = 200// Kąt nachylenia w radianach
 )
 
 
@@ -52,6 +51,7 @@ func run() {
 		if(y-d*math.Sin(alfa)>y1-lineHeight){
 			x = x1 +3 + sym_result[i]*math.Cos(alfa)
 			y = y1 +3 - sym_result[i]*math.Sin(alfa)
+			i+=1
 		}
 		
 
@@ -95,7 +95,7 @@ func run() {
 		
 		time.Sleep(time.Second/100) 
 		fmt.Println(float64(i)/100)
-		i+=1
+		
 	}
 }
 
@@ -104,7 +104,7 @@ const (
 	b=float64(0)
 	m=float64(1)
 	g=float64(20)
-	u=float64(0.5)
+	u=float64(0)
 	alfa = math.Pi/6
 )
 
@@ -127,7 +127,7 @@ func main () {
 
 	for i := 0; x*10*math.Sin(alfa)< lineHeight; i++ {
 		x = x_prev + h*v_prev+math.Pow(h,2)/2*a_prev
-		sym_result = append(sym_result,x*10)
+		sym_result = append(sym_result,x*20)
 		v = v_prev + h*a_prev
 		a = -b/m*math.Pow(v_prev,2)-g*u*math.Cos(alfa)+g*math.Sin(alfa)
 		x_prev=x
