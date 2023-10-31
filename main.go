@@ -208,7 +208,6 @@ func parameterWindow () {
 }
 
 func simulation(g,m,u,b,alfa,height float64) ([]float64,[]float64,[]float64,[]float64){
-	fmt.Println(g,m,u,b,alfa)
 	x := float64(0) 
 	x_prev := float64(0) 
 	v:=float64(0) 
@@ -242,8 +241,6 @@ func plot_results(t_result,x_result,v_result,a_result []float64) {
 	p1 := plot.New()
 	p2 := plot.New()
 	p3 := plot.New()
-
-	fmt.Println(v_result)
 
 	// Tworzenie serii danych
 	lineData1 := make(plotter.XYs, len(t_result))
