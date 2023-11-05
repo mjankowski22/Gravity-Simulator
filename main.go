@@ -12,6 +12,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
@@ -60,15 +61,20 @@ func run() {
 
 	
 	var draw_result []float64
+	var fi float64
 
 	for i := 0; i < len(x_result); i++ {
 		draw_result = append(draw_result,x_result[i]/x_result[len(x_result)-1]*lineHeight/math.Sin(alfa))
 		
+		
 	}
+	fmt.Println(a_result[len(a_result)-1])
+	fmt.Println(t_result[len(t_result)-1])
 
 	i := 0
 	for !win.Closed() {
 		win.Clear(color.Black)
+
 		d:=30.0
 		
 		imd.Clear()
@@ -76,15 +82,11 @@ func run() {
 		if(y-d*math.Sin(alfa)>y1-lineHeight){
 			x = x1 +3 + draw_result[i]*math.Cos(alfa)
 			y = y1 +3 - draw_result[i]*math.Sin(alfa)
+			fi = (a_result[i]*math.Pow(t_result[i],2)/4)
 			i+=1
 		}
-		fmt.Println(t_result[i])
+		fmt.Println(fi/math.Pi*180)
 		
-
-		
-
-		
-		// Narysuj równię pochyloną
 		imd.Color = color.White
 		imd.Push(pixel.V(x1, y1-lineHeight), pixel.V(x1+lineHeight/math.Tan(alfa), y1-lineHeight))
 		imd.Push(pixel.V(x1, y1), pixel.V(x1+lineHeight/math.Tan(alfa), y1-lineHeight))
@@ -95,22 +97,27 @@ func run() {
 		imd.Color = color.RGBA{255,0,0,0}
 		
 
-		x2 := x + d * math.Cos(alfa)
-		y2 := y - d * math.Sin(alfa)
+		// x2 := x + d * math.Cos(alfa)
+		// y2 := y - d * math.Sin(alfa)
 
-		x3 := x + d * math.Sin(alfa)
-		y3 := y + d * math.Cos(alfa)
+		// x3 := x + d * math.Sin(alfa)
+		// y3 := y + d * math.Cos(alfa)
 
-		x4 := x + d * (math.Cos(alfa) + math.Sin(alfa))
-		y4 := y - d * (math.Sin(alfa) - math.Cos(alfa))
+		// x4 := x + d * (math.Cos(alfa) + math.Sin(alfa))
+		// y4 := y - d * (math.Sin(alfa) - math.Cos(alfa))
 		
-		imd.Push(pixel.V(x,y),pixel.V(x2,y2))
-		imd.Push(pixel.V(x2,y2),pixel.V(x4,y4))
-		imd.Push(pixel.V(x4,y4),pixel.V(x3,y3))
-		imd.Push(pixel.V(x3,y3),pixel.V(x,y))
+		// imd.Push(pixel.V(x,y),pixel.V(x2,y2))
+		// imd.Push(pixel.V(x2,y2),pixel.V(x4,y4))
+		// imd.Push(pixel.V(x4,y4),pixel.V(x3,y3))
+		// imd.Push(pixel.V(x3,y3),pixel.V(x,y))
+		// imd.Line(5)
+		imd.Push(pixel.V(x+20*math.Sin(alfa),y+20*math.Cos(alfa)))
 		
+		imd.Circle(20,5)
 
+		imd.Push(pixel.V(x+20*math.Sin(alfa),y+20*math.Cos(alfa)),pixel.V(x+20*math.Sin(alfa)+20*math.Cos(fi),y+20*math.Cos(alfa)-20*math.Sin(fi)))
 		imd.Line(5)
+		
 		
 		
 		
@@ -120,7 +127,8 @@ func run() {
 		win.Update()
 		
 		time.Sleep(time.Second/100) 
-		fmt.Println(float64(i)/100)
+		// fmt.Println(float64(i)/100)
+		
 		
 	}
 	plot_results(t_result,x_result,v_result,a_result)
@@ -139,7 +147,8 @@ func parameterWindow () {
 	app := app.New()
 	w := app.NewWindow("Hello World")
 	
-	
+	var square = false
+
 	input_gravity := widget.NewEntry()
 	input_gravity_label :=widget.NewLabel("Gravity acceleration [m/s^2]")
 	input_gravity.Text = "9.81"
@@ -193,7 +202,7 @@ func parameterWindow () {
 			fmt.Println("Erorr: ",err)
 		}
 		
-		x_result,v_result,a_result,t_result=simulation(g,m,u,b,alfa,height)
+		x_result,v_result,a_result,t_result=simulation_square(square,g,m,u,b,alfa,height)
 		
 		w.Close()
 		
@@ -207,7 +216,7 @@ func parameterWindow () {
 	w.ShowAndRun()
 }
 
-func simulation(g,m,u,b,alfa,height float64) ([]float64,[]float64,[]float64,[]float64){
+func simulation_square(square bool,g,m,u,b,alfa,height float64) ([]float64,[]float64,[]float64,[]float64){
 	x := float64(0) 
 	x_prev := float64(0) 
 	v:=float64(0) 
@@ -222,7 +231,11 @@ func simulation(g,m,u,b,alfa,height float64) ([]float64,[]float64,[]float64,[]fl
 	for i := 0; x*math.Sin(alfa)< height; i++ {
 		x = x_prev + h*v_prev+math.Pow(h,2)/2*a_prev
 		v = v_prev + h*a_prev
-		a = -b/m*math.Pow(v_prev,2)-g*u*math.Cos(alfa)+g*math.Sin(alfa)
+		if square{
+			a = -b/m*math.Pow(v_prev,2)-g*u*math.Cos(alfa)+g*math.Sin(alfa)
+		}else{
+			a = 2.0/3.0*(-b/m*math.Pow(v_prev,2)+g*math.Sin(alfa))
+		}
 		x_result = append(x_result,x)
 		v_result = append(v_result,v)
 		a_result = append(a_result,a)
@@ -233,6 +246,8 @@ func simulation(g,m,u,b,alfa,height float64) ([]float64,[]float64,[]float64,[]fl
 	}
 	return x_result,v_result,a_result,t_result
 }
+
+
 
 
 func plot_results(t_result,x_result,v_result,a_result []float64) {
@@ -297,6 +312,7 @@ func plot_results(t_result,x_result,v_result,a_result []float64) {
 	img := vgimg.New(vg.Points(500), vg.Points(600))
     dc := draw.New(img)
 
+	
 
 
 
