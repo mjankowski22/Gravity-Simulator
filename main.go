@@ -37,6 +37,7 @@ var v_result []float64
 var a_result []float64	
 var t_result []float64
 var alfa float64
+var square = true
 
 func run() {
 	cfg := pixelgl.WindowConfig{
@@ -66,10 +67,7 @@ func run() {
 	for i := 0; i < len(x_result); i++ {
 		draw_result = append(draw_result,x_result[i]/x_result[len(x_result)-1]*lineHeight/math.Sin(alfa))
 		
-		
 	}
-	fmt.Println(a_result[len(a_result)-1])
-	fmt.Println(t_result[len(t_result)-1])
 
 	i := 0
 	for !win.Closed() {
@@ -97,30 +95,31 @@ func run() {
 		imd.Color = color.RGBA{255,0,0,0}
 		
 
-		// x2 := x + d * math.Cos(alfa)
-		// y2 := y - d * math.Sin(alfa)
+		if square{
+			x2 := x + d * math.Cos(alfa)
+			y2 := y - d * math.Sin(alfa)
 
-		// x3 := x + d * math.Sin(alfa)
-		// y3 := y + d * math.Cos(alfa)
+			x3 := x + d * math.Sin(alfa)
+			y3 := y + d * math.Cos(alfa)
 
-		// x4 := x + d * (math.Cos(alfa) + math.Sin(alfa))
-		// y4 := y - d * (math.Sin(alfa) - math.Cos(alfa))
+			x4 := x + d * (math.Cos(alfa) + math.Sin(alfa))
+			y4 := y - d * (math.Sin(alfa) - math.Cos(alfa))
+			
+			imd.Push(pixel.V(x,y),pixel.V(x2,y2))
+			imd.Push(pixel.V(x2,y2),pixel.V(x4,y4))
+			imd.Push(pixel.V(x4,y4),pixel.V(x3,y3))
+			imd.Push(pixel.V(x3,y3),pixel.V(x,y))
+			imd.Line(5)
+		}else{
+			imd.Push(pixel.V(x+20*math.Sin(alfa),y+20*math.Cos(alfa)))
 		
-		// imd.Push(pixel.V(x,y),pixel.V(x2,y2))
-		// imd.Push(pixel.V(x2,y2),pixel.V(x4,y4))
-		// imd.Push(pixel.V(x4,y4),pixel.V(x3,y3))
-		// imd.Push(pixel.V(x3,y3),pixel.V(x,y))
-		// imd.Line(5)
-		imd.Push(pixel.V(x+20*math.Sin(alfa),y+20*math.Cos(alfa)))
-		
-		imd.Circle(20,5)
+			imd.Circle(20,5)
 
-		imd.Push(pixel.V(x+20*math.Sin(alfa),y+20*math.Cos(alfa)),pixel.V(x+20*math.Sin(alfa)+20*math.Cos(fi),y+20*math.Cos(alfa)-20*math.Sin(fi)))
-		imd.Line(5)
+			imd.Push(pixel.V(x+20*math.Sin(alfa),y+20*math.Cos(alfa)),pixel.V(x+20*math.Sin(alfa)+20*math.Cos(fi),y+20*math.Cos(alfa)-20*math.Sin(fi)))
+			imd.Line(5)
+		}
 		
-		
-		
-		
+
 
 		imd.Draw(win)
 
@@ -141,13 +140,15 @@ func run() {
 var h = math.Pow(10,-2)
 
 
+
+
 func parameterWindow () {
 
-	
 	app := app.New()
-	w := app.NewWindow("Hello World")
+	w := app.NewWindow("Choose parameters")
 	
-	var square = false
+	
+	
 
 	input_gravity := widget.NewEntry()
 	input_gravity_label :=widget.NewLabel("Gravity acceleration [m/s^2]")
@@ -204,14 +205,35 @@ func parameterWindow () {
 		
 		x_result,v_result,a_result,t_result=simulation_square(square,g,m,u,b,alfa,height)
 		
+		
 		w.Close()
 		
 	}
 
 	submit := widget.NewButton("Simulation",handle_submit)
+	
 
-	grid:= container.New(layout.NewGridLayout(2),input_gravity_label,input_mass_label,input_gravity,input_mass,input_friction_label,input_resistance_label,input_friction,input_resistance,input_alfa_label,input_height_label,input_alfa,input_height,submit)
+	handle_square := func(){
+		square = true
+		grid:= container.New(layout.NewGridLayout(2),input_gravity_label,input_mass_label,input_gravity,input_mass,input_friction_label,input_resistance_label,input_friction,input_resistance,input_alfa_label,input_height_label,input_alfa,input_height,submit)
+		w.SetContent(grid)
+	}
+
+	handle_cylinder := func(){
+		square = false
+		grid:= container.New(layout.NewGridLayout(2),input_gravity_label,input_mass_label,input_gravity,input_mass,input_friction_label,input_resistance_label,input_friction,input_resistance,input_alfa_label,input_height_label,input_alfa,input_height,submit)
+		w.SetContent(grid)
+		
+	}
+
+	choose_square := widget.NewButton("Square",handle_square)
+	choose_cylinder := widget.NewButton("Cylinder",handle_cylinder)
+
+	grid:=container.New(layout.NewGridLayout(2),choose_square,choose_cylinder)
 	w.SetContent(grid)
+
+	
+	
 
 	w.ShowAndRun()
 }
@@ -326,7 +348,7 @@ func plot_results(t_result,x_result,v_result,a_result []float64) {
 	plots[1][0].Draw(canvases[1][0])
 	plots[2][0].Draw(canvases[2][0])
 
-	w, err := os.Create("aligned.png")
+	w, err := os.Create("plot.png")
     if err != nil {
         panic(err)
     }
