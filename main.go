@@ -87,7 +87,7 @@ func run() {
 		imd.Clear()
 		var x float64
 		var y float64
-		if(i<len(x_result)){
+		if(y_result[i]>0){
 			x =  draw_result_x[i] + 3
 			y =  draw_result_y[i] +3
 		
@@ -308,6 +308,7 @@ func simulation(g,m,u,b,alfa,v float64) ([]float64,[]float64,[]float64){
 	for _,gravity_source := range gravity_sources{
 		r := math.Sqrt(math.Pow(gravity_source.x-x_prev,2)+math.Pow(gravity_source.y-y_prev,2))
 		F := 6.67430*math.Pow(10,-11)*m*gravity_source.mass/math.Pow(r,2)
+		fmt.Println(F/m)
 		Fx_sources += F*(gravity_source.x-x_prev)/r 
 		Fy_sources += F*(gravity_source.y-y_prev)/r 
 	}
@@ -315,8 +316,8 @@ func simulation(g,m,u,b,alfa,v float64) ([]float64,[]float64,[]float64){
 	Fy := b*(math.Pow(vx_prev,2)+math.Pow(vy_prev,2))*math.Sin(alfa) - m*g +Fy_sources
 	diff := Fy*math.Cos(alfa)+Fx*math.Sin(alfa)
 	if diff<0{
-		Fx += -diff*math.Sin(alfa)-diff*u*math.Cos(alfa) 
-		Fy += -diff*math.Cos(alfa) + diff*u*math.Sin(alfa)
+		Fx += -diff*math.Sin(alfa)+diff*u*math.Cos(alfa) 
+		Fy += -diff*math.Cos(alfa) - diff*u*math.Sin(alfa)
 	}
 	ax_prev := Fx/m
 	ay_prev := Fy/m
@@ -332,7 +333,7 @@ func simulation(g,m,u,b,alfa,v float64) ([]float64,[]float64,[]float64){
 		x := x_prev + h*vx_prev + math.Pow(h,2)/2*ax_prev
 		y := y_prev + h*vy_prev + math.Pow(h,2)/2*ay_prev
 		vx := vx_prev + h*ax_prev
-		vy := vy_prev + h*vy_prev
+		vy := vy_prev + h*ay_prev
 		Fx_sources = 0.0
 		Fy_sources = 0.0
 		for _,gravity_source := range gravity_sources{
@@ -343,16 +344,21 @@ func simulation(g,m,u,b,alfa,v float64) ([]float64,[]float64,[]float64){
 		}
 		Fx = -b*(math.Pow(vx,2)+math.Pow(vy,2))*math.Cos(alfa) + Fx_sources
 		Fy = b*(math.Pow(vx,2)+math.Pow(vy,2))*math.Sin(alfa) - m*g +Fy_sources
-		if y<=(-math.Tan(alfa)*x+height){
-			fmt.Println("Chuj")
+		if y<=(-math.Tan(alfa)*x+height+0.01) && y>=(-math.Tan(alfa)*x+height-0.01){
 			diff := Fy*math.Cos(alfa)+Fx*math.Sin(alfa)
 			if diff<0{
-				Fx = Fx -diff*math.Sin(alfa)-diff*u*math.Cos(alfa) 
-				Fy = Fy -diff*math.Cos(alfa) + diff*u*math.Sin(alfa)
+				Fx = Fx -diff*math.Sin(alfa)+diff*u*math.Cos(alfa) 
+				Fy = Fy -diff*math.Cos(alfa) - diff*u*math.Sin(alfa)
 			}
 		}
+		
+		
+		// fmt.Println(float64(i)*h)
+
 		ax := Fx/m
 		ay := Fy/m
+		
+		
 		x_result = append(x_result, x)
 		y_result = append(y_result, y)
 		vx_result = append(vx_result, vx)
@@ -418,8 +424,8 @@ func plot_results(t_result,x_result,v_result,a_result []float64) {
 	}
 	lineData3 := make(plotter.XYs, len(t_result))
 	for i := range t_result {
-		lineData3[i].X = t_result[i]
-		lineData3[i].Y = a_result[i]
+		lineData3[i].X = x_result[i]
+		lineData3[i].Y = y_result[i]
 	}
 	line1, err := plotter.NewLine(lineData1)
 	if err != nil {
