@@ -13,6 +13,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"
@@ -172,7 +173,7 @@ func parameterWindow () {
 	input_friction.Text ="0.1"
 
 	input_resistance := widget.NewEntry()
-	input_resistance_label :=widget.NewLabel("Resistance paramater [jakis parametr]")
+	input_resistance_label :=widget.NewLabel("Resistance paramater [kg/m]")
 	input_resistance.Text ="0.1"
 
 	input_alfa := widget.NewEntry()
