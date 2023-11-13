@@ -43,10 +43,23 @@ var gravity_sources []Gravity_Source
 var height float64
 
 
+type Gravity_Input struct{
+	input_gravity *widget.Entry
+	input_x *widget.Entry
+	input_y *widget.Entry
+}
+
+type Gravity_Source struct{
+	mass float64
+	x float64
+	y float64
+}
+
+
 
 func run() {
 	cfg := pixelgl.WindowConfig{
-		Title:  "Animacja Równi Pochylonej",
+		Title:  "Animation",
 		Bounds: pixel.R(0, 0, windowWidth, windowHeight),
 		VSync:  true,
 	}
@@ -136,20 +149,6 @@ func run() {
 
 
 
-
-
-
-type Gravity_Input struct{
-	input_gravity *widget.Entry
-	input_x *widget.Entry
-	input_y *widget.Entry
-}
-
-type Gravity_Source struct{
-	mass float64
-	x float64
-	y float64
-}
 
 func parameterWindow () {
 
@@ -250,7 +249,7 @@ func parameterWindow () {
 		
 		input_number := strconv.Itoa(len(gravity_sources)+1)
 		input_gravity :=widget.NewEntry()
-		input_gravity_label := widget.NewLabel(input_number+"1M * Mass [kg]")
+		input_gravity_label := widget.NewLabel(input_number+" 1M * Mass [kg]")
 		input_x :=widget.NewEntry()
 		input_x_label := widget.NewLabel(input_number+" X[m]")
 		input_y :=widget.NewEntry()
