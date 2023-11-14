@@ -347,6 +347,12 @@ func simulation(g,m,u,b,alfa,v float64) (){
 				Fy = Fy -diff*math.Cos(alfa) - diff*u*math.Sin(alfa)
 			}
 		}else if y<(-math.Tan(alfa)*x+height-0.01){
+			diff := Fy*math.Cos(alfa)+Fx*math.Sin(alfa)
+			if diff<0{
+				Fx = Fx -diff*math.Sin(alfa)+diff*u*math.Cos(alfa) 
+				Fy = Fy -diff*math.Cos(alfa) - diff*u*math.Sin(alfa)
+			}
+			y = -math.Tan(alfa)*x+height
 			vy = -vy
 		}
 		
